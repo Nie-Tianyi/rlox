@@ -6,7 +6,7 @@ use clap::{Parser, ValueHint};
 use std::io::{Read, Write};
 use std::path::Path;
 use std::{fs, io};
-
+use crate::scanner::Scanner;
 
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
@@ -53,5 +53,5 @@ fn run_file(path: impl AsRef<Path>) {
 
 
 fn run(source_code: String) {
-    println!("run {:?}", source_code.into_bytes())
+    println!("run {:?}", Scanner::parse(source_code))
 }

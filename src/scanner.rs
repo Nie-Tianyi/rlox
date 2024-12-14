@@ -3,8 +3,8 @@ use crate::token::{Literal, Token, TokenType};
 use std::collections::HashMap;
 
 
-#[derive(Debug)]
-struct Scanner<'a> {
+#[derive(Debug, Clone, PartialEq)]
+pub struct Scanner<'a> {
     source: String,
     tokens: Vec<Token>,
     start: usize,
@@ -217,7 +217,7 @@ impl Scanner<'_> {
         self.source.chars().nth(self.current + 1)
     }
 
-
+    #[inline]
     fn add_token(&mut self, token_type: TokenType, literal: Literal) {
         let text = &self.source[self.start..self.current];
         self.tokens.push(Token::new(token_type, text, literal, self.line));
@@ -228,6 +228,7 @@ impl Scanner<'_> {
         self.tokens
     }
 
+    #[inline]
     pub fn parse(source_code: impl ToString) -> Vec<Token> {
         let mut scanner = Scanner::new(source_code);
         scanner.scan_tokens();
