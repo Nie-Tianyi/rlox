@@ -61,9 +61,15 @@ pub enum Literal {
 impl Display for Literal {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Literal::String(s) => { write!(f, "\"{}\"", s) }
-            Literal::Number(fl) => { write!(f, "\"{}\"", fl) }
-            Literal::Null => { write!(f, "None") }
+            Literal::String(s) => {
+                write!(f, "\"{}\"", s)
+            }
+            Literal::Number(fl) => {
+                write!(f, "\"{}\"", fl)
+            }
+            Literal::Null => {
+                write!(f, "None")
+            }
         }
     }
 }
@@ -77,7 +83,12 @@ pub struct Token {
 }
 
 impl Token {
-    pub fn new(token_type: TokenType, lexeme: impl ToString, literal: Literal, line: usize) -> Self {
+    pub fn new(
+        token_type: TokenType,
+        lexeme: impl ToString,
+        literal: Literal,
+        line: usize,
+    ) -> Self {
         Token {
             token_type,
             lexeme: lexeme.to_string(),
@@ -87,13 +98,15 @@ impl Token {
     }
 }
 
-
 impl Display for Token {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "<{:?}-{}-{}>", self.token_type, self.lexeme, self.literal)
+        write!(
+            f,
+            "<{:?}-{}-{}>",
+            self.token_type, self.lexeme, self.literal
+        )
     }
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -101,7 +114,12 @@ mod tests {
 
     #[test]
     fn test() {
-        let token = Token::new(TokenType::String, "String".to_string(), Literal::String("Hello World".to_string()), 12);
+        let token = Token::new(
+            TokenType::String,
+            "String".to_string(),
+            Literal::String("Hello World".to_string()),
+            12,
+        );
         println!("{token}")
     }
 }

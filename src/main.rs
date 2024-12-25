@@ -1,12 +1,12 @@
 mod reporter;
-mod token;
 mod scanner;
+mod token;
 
+use crate::scanner::Scanner;
 use clap::{Parser, ValueHint};
 use std::io::{Read, Write};
 use std::path::Path;
 use std::{fs, io};
-use crate::scanner::Scanner;
 
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
@@ -15,7 +15,6 @@ struct Cli {
         value_hint = ValueHint::FilePath,)]
     path: Option<String>,
 }
-
 
 fn main() {
     let cli = Cli::parse();
@@ -34,8 +33,13 @@ fn run_prompt() {
         print!("> ");
         io::stdout().flush().expect("fail to flush");
 
-        stdin.read_line(&mut input).expect("fail to read from terminal");
-        if input == "\n" { break; }
+        stdin
+            .read_line(&mut input)
+            .expect("fail to read from terminal");
+
+        if input == "\n" {
+            break;
+        }
 
         run(input.clone());
         input.clear();
@@ -46,11 +50,11 @@ fn run_file(path: impl AsRef<Path>) {
     let mut file = fs::File::open(path).expect("fail to find given file");
     let mut content = String::new();
 
-    file.read_to_string(&mut content).expect("fail to read given file");
+    file.read_to_string(&mut content)
+        .expect("fail to read given file");
 
     run(content);
 }
-
 
 fn run(source_code: String) {
     println!("run {:?}", Scanner::parse(source_code))

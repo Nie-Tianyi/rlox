@@ -1,21 +1,12 @@
 use crate::reporter;
 use crate::token::{Literal, Token, TokenType};
+use lazy_static::lazy_static;
 use std::collections::HashMap;
 
-
-#[derive(Debug, Clone, PartialEq)]
-pub struct Scanner<'a> {
-    source: String,
-    tokens: Vec<Token>,
-    start: usize,
-    current: usize,
-    line: usize,
-    key_words: HashMap<&'a str, TokenType>,
-}
-
-impl Scanner<'_> {
-    fn new(source: impl ToString) -> Self {
+lazy_static! {
+    static ref KEYWORDS: HashMap<&'static str, TokenType> = {
         let mut key_words = HashMap::new();
+
         key_words.insert("and", TokenType::And);
         key_words.insert("class", TokenType::Class);
         key_words.insert("else", TokenType::Else);
@@ -33,13 +24,27 @@ impl Scanner<'_> {
         key_words.insert("var", TokenType::Var);
         key_words.insert("while", TokenType::While);
 
+        key_words
+    };
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct Scanner {
+    source: String,
+    tokens: Vec<Token>,
+    start: usize,
+    current: usize,
+    line: usize,
+}
+
+impl Scanner {
+    fn new(source: impl ToString) -> Self {
         Scanner {
             source: source.to_string(),
             tokens: vec![],
             start: 0,
             current: 0,
             line: 1,
-            key_words,
         }
     }
 
@@ -114,14 +119,8 @@ impl Scanner<'_> {
             }
         }
 
-        self.tokens.push(
-            Token::new(
-                TokenType::EOF,
-                "",
-                Literal::Null,
-                self.line,
-            )
-        );
+        self.tokens
+            .push(Token::new(TokenType::EOF, "", Literal::Null, self.line));
     }
 
     #[inline]
@@ -145,7 +144,7 @@ impl Scanner<'_> {
         }
 
         let text = &self.source[self.start..self.current];
-        let token_type = self.key_words.get(text);
+        let token_type = KEYWORDS.get(text);
 
         let token_type = if token_type.is_none() {
             TokenType::Identifier
@@ -160,7 +159,10 @@ impl Scanner<'_> {
         while Self::is_digit(self.peek().unwrap()) {
             self.next_char();
         }
-        if self.peek() == Some('.') && self.peek_next().is_some() && Self::is_digit(self.peek_next().unwrap()) {
+        if self.peek() == Some('.')
+            && self.peek_next().is_some()
+            && Self::is_digit(self.peek_next().unwrap())
+        {
             self.next_char();
             while Self::is_digit(self.peek().unwrap()) {
                 self.next_char();
@@ -176,7 +178,9 @@ impl Scanner<'_> {
 
     fn string(&mut self) {
         while self.peek().is_some() && self.peek().unwrap() != '"' {
-            if self.peek() == Some('\n') { self.line += 1 }
+            if self.peek() == Some('\n') {
+                self.line += 1
+            }
             self.next_char();
         }
         if self.peek().is_none() {
@@ -220,7 +224,8 @@ impl Scanner<'_> {
     #[inline]
     fn add_token(&mut self, token_type: TokenType, literal: Literal) {
         let text = &self.source[self.start..self.current];
-        self.tokens.push(Token::new(token_type, text, literal, self.line));
+        self.tokens
+            .push(Token::new(token_type, text, literal, self.line));
     }
 
     #[inline]
@@ -236,14 +241,18 @@ impl Scanner<'_> {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn test() {
-        let tokens = Scanner::parse("var i = 1; // this is a comment");
+        let tokens = Scanner::parse(
+            r#"
+                var i = 1; // this is a comment
+                print i;
+            "#,
+        );
         println!("{tokens:?}")
     }
 }
