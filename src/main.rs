@@ -1,6 +1,7 @@
 mod reporter;
 mod scanner;
 mod token;
+mod expression;
 
 use crate::scanner::Scanner;
 use clap::{Parser, ValueHint};
