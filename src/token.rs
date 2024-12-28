@@ -48,6 +48,7 @@ pub enum TokenType {
     Var,
     While,
 
+    #[allow(clippy::upper_case_acronyms)]
     EOF,
 }
 

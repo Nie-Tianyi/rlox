@@ -55,9 +55,10 @@ impl Scanner {
                 match c {
                     '(' => self.add_token(TokenType::LeftParen, Literal::Null),
                     ')' => self.add_token(TokenType::RightParen, Literal::Null),
-                    '{' => self.add_token(TokenType::RightBrace, Literal::Null),
+                    '{' => self.add_token(TokenType::LeftBrace, Literal::Null),
                     '}' => self.add_token(TokenType::RightBrace, Literal::Null),
-                    '.' => self.add_token(TokenType::Comma, Literal::Null),
+                    ',' => self.add_token(TokenType::Comma, Literal::Null),
+                    '.' => self.add_token(TokenType::Dot, Literal::Null),
                     '-' => self.add_token(TokenType::Minus, Literal::Null),
                     '+' => self.add_token(TokenType::Plus, Literal::Null),
                     ';' => self.add_token(TokenType::Semicolon, Literal::Null),
@@ -92,7 +93,7 @@ impl Scanner {
                     }
                     '/' => {
                         if self.next_char_matches('/') {
-                            while self.peek() != None && self.peek() != Some('\n') {
+                            while self.peek().is_some() && self.peek() != Some('\n') {
                                 self.next_char();
                             }
                         } else {
@@ -125,12 +126,12 @@ impl Scanner {
 
     #[inline]
     fn is_digit(c: char) -> bool {
-        '0' <= c && c <= '9'
+        c.is_ascii_digit()
     }
 
     #[inline]
     fn is_alpha(c: char) -> bool {
-        ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || c == '_'
+        c.is_ascii_uppercase() || c.is_ascii_lowercase() || c == '_'
     }
 
     #[inline]
@@ -146,13 +147,11 @@ impl Scanner {
         let text = &self.source[self.start..self.current];
         let token_type = KEYWORDS.get(text);
 
-        let token_type = if token_type.is_none() {
-            TokenType::Identifier
+        if let Some(token_type) = token_type {
+            self.add_token(*token_type, Literal::Null);
         } else {
-            *token_type.unwrap()
-        };
-
-        self.add_token(token_type, Literal::Null);
+            self.add_token(TokenType::Identifier, Literal::Null);
+        }
     }
 
     fn number(&mut self) {
