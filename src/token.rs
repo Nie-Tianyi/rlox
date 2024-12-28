@@ -63,13 +63,13 @@ impl Display for Literal {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             Literal::String(s) => {
-                write!(f, "\"{}\"", s)
+                write!(f, "string:\"{}\"", s)
             }
             Literal::Number(fl) => {
-                write!(f, "\"{}\"", fl)
+                write!(f, "number:\"{}\"", fl)
             }
             Literal::Null => {
-                write!(f, "None")
+                write!(f, "Null")
             }
         }
     }
