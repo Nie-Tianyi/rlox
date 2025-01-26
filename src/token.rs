@@ -77,10 +77,10 @@ impl Display for Literal {
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Token {
-    token_type: TokenType,
-    lexeme: String,
-    literal: Literal,
-    line: usize,
+    token_type: TokenType, // token的类型
+    lexeme: String,        // token的源代码中的表示
+    literal: Literal, // 当token为String或者Number时，这里记录String或者Number的具体内容，其他的为Null
+    line: usize,      // token在源码的第几行
 }
 
 impl Token {
