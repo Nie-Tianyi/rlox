@@ -37,7 +37,6 @@ macro_rules! define_ast {
     };
 }
 
-
 define_ast! {
     (Binary(left: Box<Expression>, operator: String, right: Box<Expression>), visit_binary),
     (Literal(value: String), visit_literal),
@@ -52,7 +51,12 @@ mod tests {
     struct AstPrinter;
 
     impl ExprVisitor<String> for AstPrinter {
-        fn visit_binary(&self, left: &Box<Expression>, op: &String, right: &Box<Expression>) -> String {
+        fn visit_binary(
+            &self,
+            left: &Box<Expression>,
+            op: &String,
+            right: &Box<Expression>,
+        ) -> String {
             format!("({} {} {})", op, left.accept(self), right.accept(self))
         }
 
@@ -69,14 +73,14 @@ mod tests {
     fn test_ast() {
         let expr = Expression::Binary {
             left: Box::new(Expression::Literal {
-                value: "1".to_string()
+                value: "1".to_string(),
             }),
             operator: "+".to_string(),
             right: Box::new(Expression::Grouping {
                 expr: Box::new(Expression::Literal {
-                    value: "2".to_string()
-                })
-            })
+                    value: "2".to_string(),
+                }),
+            }),
         };
 
         let printer = AstPrinter;
