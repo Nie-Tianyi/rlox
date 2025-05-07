@@ -240,18 +240,20 @@ impl Scanner {
     }
 }
 
+
 #[cfg(test)]
 mod tests {
+    use crate::token::TokenStream;
     use super::*;
 
     #[test]
     fn test() {
-        let tokens = Scanner::parse(
+        let tokens: TokenStream = Scanner::parse(
             r#"
                 var i = 1; // this is a comment
                 print i;
             "#,
-        );
+        ).into();
         println!("{tokens:?}")
     }
 }
