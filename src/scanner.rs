@@ -240,11 +240,10 @@ impl Scanner {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
-    use crate::token::TokenStream;
     use super::*;
+    use crate::token::TokenStream;
 
     #[test]
     fn test() {
@@ -253,7 +252,8 @@ mod tests {
                 var i = 1; // this is a comment
                 print i;
             "#,
-        ).into();
+        )
+        .into();
         println!("{tokens:?}")
     }
 }

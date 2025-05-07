@@ -1,4 +1,5 @@
 mod expression;
+mod parser;
 mod reporter;
 mod scanner;
 mod token;

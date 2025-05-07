@@ -179,7 +179,6 @@ impl Display for TokenStream {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;

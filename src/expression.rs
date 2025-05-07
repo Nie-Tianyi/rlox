@@ -1,4 +1,4 @@
-use crate::token::Token;
+use crate::token::{Literal, Token};
 
 // 定义AST的宏（支持你期望的语法）
 macro_rules! define_ast {
@@ -49,13 +49,13 @@ define_ast! {
 struct AstPrinter;
 
 impl ExprVisitor<String> for AstPrinter {
-    fn visit_binary(
-        &self,
-        left: &Box<Expression>,
-        op: &Token,
-        right: &Box<Expression>,
-    ) -> String {
-        format!("({} {} {})", op.lexeme(), left.accept(self), right.accept(self))
+    fn visit_binary(&self, left: &Box<Expression>, op: &Token, right: &Box<Expression>) -> String {
+        format!(
+            "({} {} {})",
+            op.lexeme(),
+            left.accept(self),
+            right.accept(self)
+        )
     }
 
     fn visit_literal(&self, value: &Literal) -> String {
@@ -74,9 +74,8 @@ impl ExprVisitor<String> for AstPrinter {
 // 测试代码
 #[cfg(test)]
 mod tests {
-    use crate::token::TokenType;
     use super::*;
-
+    use crate::token::TokenType;
 
     #[test]
     fn test_ast() {
