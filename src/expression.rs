@@ -1,3 +1,5 @@
+use crate::token::{Literal, Token};
+
 // 定义AST的宏（支持你期望的语法）
 macro_rules! define_ast {
     (
@@ -38,47 +40,54 @@ macro_rules! define_ast {
 }
 
 define_ast! {
-    (Binary(left: Box<Expression>, operator: String, right: Box<Expression>), visit_binary),
-    (Literal(value: String), visit_literal),
-    (Grouping(expr: Box<Expression>), visit_grouping)
+    (Binary(left: Box<Expression>, operator: Token, right: Box<Expression>), visit_binary),
+    (Literal(value: Literal), visit_literal),
+    (Grouping(expr: Box<Expression>), visit_grouping),
+    (Unary(operator: Token, right: Box<Expression>), visit_unary)
+}
+
+struct AstPrinter;
+
+impl ExprVisitor<String> for AstPrinter {
+    fn visit_binary(
+        &self,
+        left: &Box<Expression>,
+        op: &Token,
+        right: &Box<Expression>,
+    ) -> String {
+        format!("({} {} {})", op.lexeme(), left.accept(self), right.accept(self))
+    }
+
+    fn visit_literal(&self, value: &Literal) -> String {
+        Literal::to_string(value)
+    }
+
+    fn visit_grouping(&self, expr: &Box<Expression>) -> String {
+        format!("(group {})", expr.accept(self))
+    }
+
+    fn visit_unary(&self, operator: &Token, right: &Box<Expression>) -> String {
+        format!("({} {})", operator.lexeme(), right.accept(self))
+    }
 }
 
 // 测试代码
 #[cfg(test)]
 mod tests {
+    use crate::token::TokenType;
     use super::*;
 
-    struct AstPrinter;
-
-    impl ExprVisitor<String> for AstPrinter {
-        fn visit_binary(
-            &self,
-            left: &Box<Expression>,
-            op: &String,
-            right: &Box<Expression>,
-        ) -> String {
-            format!("({} {} {})", op, left.accept(self), right.accept(self))
-        }
-
-        fn visit_literal(&self, value: &String) -> String {
-            value.clone()
-        }
-
-        fn visit_grouping(&self, expr: &Box<Expression>) -> String {
-            format!("(group {})", expr.accept(self))
-        }
-    }
 
     #[test]
     fn test_ast() {
         let expr = Expression::Binary {
             left: Box::new(Expression::Literal {
-                value: "1".to_string(),
+                value: Literal::String("1".to_string()),
             }),
-            operator: "+".to_string(),
+            operator: Token::new(TokenType::Plus, "+", Literal::Null, 1),
             right: Box::new(Expression::Grouping {
                 expr: Box::new(Expression::Literal {
-                    value: "2".to_string(),
+                    value: Literal::String("2".to_string()),
                 }),
             }),
         };

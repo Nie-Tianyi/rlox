@@ -1,4 +1,4 @@
-use std::fmt::{Display, Formatter};
+use std::fmt::{Debug, Display, Formatter};
 
 #[derive(PartialEq, Eq, Copy, Clone, Debug)]
 pub enum TokenType {
@@ -52,14 +52,14 @@ pub enum TokenType {
     EOF,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Clone, PartialEq)]
 pub enum Literal {
     String(String),
     Number(f64),
     Null,
 }
 
-impl Display for Literal {
+impl Debug for Literal {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             Literal::String(s) => {
@@ -75,7 +75,23 @@ impl Display for Literal {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+impl Display for Literal {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Literal::String(s) => {
+                write!(f, "{}", s)
+            }
+            Literal::Number(fl) => {
+                write!(f, "{}", fl)
+            }
+            Literal::Null => {
+                write!(f, "Null")
+            }
+        }
+    }
+}
+
+#[derive(Clone, PartialEq)]
 pub struct Token {
     token_type: TokenType,
     lexeme: String,
@@ -97,15 +113,46 @@ impl Token {
             line,
         }
     }
+
+    pub fn token_type(&self) -> TokenType {
+        self.token_type
+    }
+
+    pub fn lexeme(&self) -> &str {
+        &self.lexeme
+    }
+
+    pub fn literal(&self) -> &Literal {
+        &self.literal
+    }
+}
+
+impl Debug for Token {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "<{:?}-{:?}-{:?}>",
+            self.token_type, self.lexeme, self.literal
+        )
+    }
 }
 
 impl Display for Token {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "<{:?}-{}-{}>",
-            self.token_type, self.lexeme, self.literal
-        )
+        match self.token_type {
+            TokenType::EOF => {
+                write!(f, "EOF")
+            }
+            TokenType::String => {
+                write!(f, "{}", self.literal)
+            }
+            TokenType::Number => {
+                write!(f, "{}", self.literal)
+            }
+            _ => {
+                write!(f, "{}", self.lexeme)
+            }
+        }
     }
 }
 
@@ -117,10 +164,11 @@ mod tests {
     fn test() {
         let token = Token::new(
             TokenType::String,
-            "String".to_string(),
+            "String",
             Literal::String("Hello World".to_string()),
             12,
         );
-        println!("{token}")
+        println!("{token:?}");
+        println!("{token}");
     }
 }
