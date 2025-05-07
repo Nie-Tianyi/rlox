@@ -141,20 +141,44 @@ impl Display for Token {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self.token_type {
             TokenType::EOF => {
-                write!(f, "EOF")
+                write!(f, "EOF")?;
             }
             TokenType::String => {
-                write!(f, "{}", self.literal)
+                write!(f, "{}", self.literal)?;
             }
             TokenType::Number => {
-                write!(f, "{}", self.literal)
+                write!(f, "{}", self.literal)?;
             }
             _ => {
-                write!(f, "{}", self.lexeme)
+                write!(f, "{}", self.lexeme)?;
             }
         }
+        Ok(())
     }
 }
+
+#[derive(Debug)]
+pub struct TokenStream(Vec<Token>);
+
+impl From<Vec<Token>> for TokenStream {
+    fn from(value: Vec<Token>) -> Self {
+        TokenStream(value)
+    }
+}
+
+impl Display for TokenStream {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        let mut tokens = self.0.iter();
+        if let Some(first) = tokens.next() {
+            write!(f, "{}", first)?;
+            for token in tokens {
+                write!(f, " {}", token)?;
+            }
+        }
+        Ok(())
+    }
+}
+
 
 #[cfg(test)]
 mod tests {
