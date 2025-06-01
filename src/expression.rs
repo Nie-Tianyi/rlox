@@ -1,5 +1,13 @@
 use crate::token::{Literal, Token};
 
+/**
+ * expression     → literal | unary | binary| grouping ;
+ * literal        → NUMBER | STRING | "true" | "false" | "nil" ;
+ * grouping       → "(" expression ")" ;
+ * unary          → ( "-" | "!" ) expression ;
+ * binary         → expression operator expression ;
+ * operator       → "==" | "!=" | "<" | "<=" | ">" | ">="| "+"  | "-"  | "*" | "/" ;
+ */
 // 定义AST的宏（支持你期望的语法）
 macro_rules! define_ast {
     (
@@ -46,6 +54,7 @@ define_ast! {
     (Unary(operator: Token, right: Box<Expression>), visit_unary)
 }
 
+#[allow(unused)]
 struct AstPrinter;
 
 impl ExprVisitor<String> for AstPrinter {
@@ -91,7 +100,6 @@ mod tests {
             }),
         };
 
-        let printer = AstPrinter;
-        assert_eq!(expr.accept(&printer), "(+ 1 (group 2))");
+        assert_eq!(expr.accept(&AstPrinter), "(+ 1 (group 2))");
     }
 }
