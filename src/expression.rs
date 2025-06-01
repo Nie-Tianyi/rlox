@@ -1,6 +1,7 @@
 use crate::token::{Literal, Token};
 
-/**
+/*
+ * Lox语法规则：
  * expression     → literal | unary | binary| grouping ;
  * literal        → NUMBER | STRING | "true" | "false" | "nil" ;
  * grouping       → "(" expression ")" ;
