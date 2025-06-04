@@ -58,11 +58,11 @@ define_ast! {
 
 #[derive(PartialEq)]
 pub enum ExprLiteral {
-    String(String),
-    Number(f64),
-    Nil,
-    True,
-    False,
+    String(String), // strings
+    Number(f64),    // numbers
+    Nil,            // nil
+    True,           // true
+    False,          // false
 }
 
 impl Debug for ExprLiteral {

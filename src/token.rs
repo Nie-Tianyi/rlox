@@ -54,9 +54,9 @@ pub enum TokenType {
 
 #[derive(Clone, PartialEq)]
 pub enum Literal {
-    String(String),
-    Number(f64),
-    Null,
+    String(String), // string literal
+    Number(f64),    // 所有的number内部使用f64储存
+    Null,           // 用于占位，表示该Token没有Literal
 }
 
 impl Debug for Literal {
