@@ -246,11 +246,24 @@ mod tests {
     use crate::token::TokenStream;
 
     #[test]
-    fn test() {
+    fn test_1() {
         let tokens: TokenStream = Scanner::parse(
             r#"
                 var i = 1; // this is a comment
                 print i;
+            "#,
+        )
+        .into();
+        println!("{tokens:?}")
+    }
+
+    #[test]
+    fn test_2() {
+        let tokens: TokenStream = Scanner::parse(
+            r#"
+                var a = true; // this is a comment
+                var b = 2.13;
+                var c = "abc";
             "#,
         )
         .into();

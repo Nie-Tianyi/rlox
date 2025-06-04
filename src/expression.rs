@@ -1,4 +1,5 @@
 use crate::token::{Literal, Token};
+use std::fmt::{Debug, Display, Formatter};
 
 /*
  * Lox语法规则：
@@ -50,9 +51,62 @@ macro_rules! define_ast {
 
 define_ast! {
     (Binary(left: Box<Expression>, operator: Token, right: Box<Expression>), visit_binary),
-    (Literal(value: Literal), visit_literal),
+    (Literal(value: ExprLiteral), visit_literal),
     (Grouping(expr: Box<Expression>), visit_grouping),
     (Unary(operator: Token, right: Box<Expression>), visit_unary)
+}
+
+#[derive(PartialEq)]
+pub enum ExprLiteral {
+    String(String),
+    Number(f64),
+    Nil,
+    True,
+    False,
+}
+
+impl Debug for ExprLiteral {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ExprLiteral::String(s) => {
+                write!(f, "string:\"{}\"", s)
+            }
+            ExprLiteral::Number(fl) => {
+                write!(f, "number:\"{}\"", fl)
+            }
+            ExprLiteral::Nil => {
+                write!(f, "nil")
+            }
+            ExprLiteral::False => {
+                write!(f, "false")
+            }
+            ExprLiteral::True => {
+                write!(f, "true")
+            }
+        }
+    }
+}
+
+impl Display for ExprLiteral {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ExprLiteral::String(s) => {
+                write!(f, "{}", s)
+            }
+            ExprLiteral::Number(fl) => {
+                write!(f, "{}", fl)
+            }
+            ExprLiteral::Nil => {
+                write!(f, "nil")
+            }
+            ExprLiteral::True => {
+                write!(f, "true")
+            }
+            ExprLiteral::False => {
+                write!(f, "false")
+            }
+        }
+    }
 }
 
 #[allow(unused)]
@@ -68,8 +122,8 @@ impl ExprVisitor<String> for AstPrinter {
         )
     }
 
-    fn visit_literal(&self, value: &Literal) -> String {
-        Literal::to_string(value)
+    fn visit_literal(&self, value: &ExprLiteral) -> String {
+        ExprLiteral::to_string(value)
     }
 
     fn visit_grouping(&self, expr: &Box<Expression>) -> String {
@@ -91,12 +145,12 @@ mod tests {
     fn test_ast() {
         let expr = Expression::Binary {
             left: Box::new(Expression::Literal {
-                value: Literal::String("1".to_string()),
+                value: ExprLiteral::String("1".to_string()),
             }),
             operator: Token::new(TokenType::Plus, "+", Literal::Null, 1),
             right: Box::new(Expression::Grouping {
                 expr: Box::new(Expression::Literal {
-                    value: Literal::String("2".to_string()),
+                    value: ExprLiteral::String("2".to_string()),
                 }),
             }),
         };
