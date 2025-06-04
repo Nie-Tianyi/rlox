@@ -147,7 +147,7 @@ mod tests {
             left: Box::new(Expression::Literal {
                 value: ExprLiteral::String("1".to_string()),
             }),
-            operator: Token::new(TokenType::Plus, "+", Literal::Null, 1),
+            operator: Token::new(TokenType::Plus, "+", Literal::None, 1),
             right: Box::new(Expression::Grouping {
                 expr: Box::new(Expression::Literal {
                     value: ExprLiteral::String("2".to_string()),

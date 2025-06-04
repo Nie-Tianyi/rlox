@@ -56,7 +56,7 @@ pub enum TokenType {
 pub enum Literal {
     String(String), // string literal
     Number(f64),    // 所有的number内部使用f64储存
-    Null,           // 用于占位，表示该Token没有Literal
+    None,           // 用于占位，表示该Token没有Literal
 }
 
 impl Debug for Literal {
@@ -68,8 +68,8 @@ impl Debug for Literal {
             Literal::Number(fl) => {
                 write!(f, "number:\"{}\"", fl)
             }
-            Literal::Null => {
-                write!(f, "Null")
+            Literal::None => {
+                write!(f, "None")
             }
         }
     }
@@ -84,8 +84,8 @@ impl Display for Literal {
             Literal::Number(fl) => {
                 write!(f, "{}", fl)
             }
-            Literal::Null => {
-                write!(f, "Null")
+            Literal::None => {
+                write!(f, "None")
             }
         }
     }

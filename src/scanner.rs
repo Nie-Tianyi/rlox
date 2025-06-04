@@ -53,42 +53,42 @@ impl Scanner {
             self.start = self.current;
             if let Some(c) = self.next_char() {
                 match c {
-                    '(' => self.add_token(TokenType::LeftParen, Literal::Null),
-                    ')' => self.add_token(TokenType::RightParen, Literal::Null),
-                    '{' => self.add_token(TokenType::LeftBrace, Literal::Null),
-                    '}' => self.add_token(TokenType::RightBrace, Literal::Null),
-                    ',' => self.add_token(TokenType::Comma, Literal::Null),
-                    '.' => self.add_token(TokenType::Dot, Literal::Null),
-                    '-' => self.add_token(TokenType::Minus, Literal::Null),
-                    '+' => self.add_token(TokenType::Plus, Literal::Null),
-                    ';' => self.add_token(TokenType::Semicolon, Literal::Null),
-                    '*' => self.add_token(TokenType::Star, Literal::Null),
+                    '(' => self.add_token(TokenType::LeftParen, Literal::None),
+                    ')' => self.add_token(TokenType::RightParen, Literal::None),
+                    '{' => self.add_token(TokenType::LeftBrace, Literal::None),
+                    '}' => self.add_token(TokenType::RightBrace, Literal::None),
+                    ',' => self.add_token(TokenType::Comma, Literal::None),
+                    '.' => self.add_token(TokenType::Dot, Literal::None),
+                    '-' => self.add_token(TokenType::Minus, Literal::None),
+                    '+' => self.add_token(TokenType::Plus, Literal::None),
+                    ';' => self.add_token(TokenType::Semicolon, Literal::None),
+                    '*' => self.add_token(TokenType::Star, Literal::None),
                     '!' => {
                         if self.next_char_matches('=') {
-                            self.add_token(TokenType::Bang, Literal::Null);
+                            self.add_token(TokenType::Bang, Literal::None);
                         } else {
-                            self.add_token(TokenType::BangEqual, Literal::Null);
+                            self.add_token(TokenType::BangEqual, Literal::None);
                         }
                     }
                     '=' => {
                         if self.next_char_matches('=') {
-                            self.add_token(TokenType::EqualEqual, Literal::Null);
+                            self.add_token(TokenType::EqualEqual, Literal::None);
                         } else {
-                            self.add_token(TokenType::Equal, Literal::Null);
+                            self.add_token(TokenType::Equal, Literal::None);
                         }
                     }
                     '<' => {
                         if self.next_char_matches('=') {
-                            self.add_token(TokenType::LessEqual, Literal::Null);
+                            self.add_token(TokenType::LessEqual, Literal::None);
                         } else {
-                            self.add_token(TokenType::Less, Literal::Null);
+                            self.add_token(TokenType::Less, Literal::None);
                         }
                     }
                     '>' => {
                         if self.next_char_matches('=') {
-                            self.add_token(TokenType::GreaterEqual, Literal::Null);
+                            self.add_token(TokenType::GreaterEqual, Literal::None);
                         } else {
-                            self.add_token(TokenType::Greater, Literal::Null);
+                            self.add_token(TokenType::Greater, Literal::None);
                         }
                     }
                     '/' => {
@@ -97,7 +97,7 @@ impl Scanner {
                                 self.next_char();
                             }
                         } else {
-                            self.add_token(TokenType::Slash, Literal::Null);
+                            self.add_token(TokenType::Slash, Literal::None);
                         }
                     }
 
@@ -121,7 +121,7 @@ impl Scanner {
         }
 
         self.tokens
-            .push(Token::new(TokenType::EOF, "", Literal::Null, self.line));
+            .push(Token::new(TokenType::EOF, "", Literal::None, self.line));
     }
 
     #[inline]
@@ -148,9 +148,9 @@ impl Scanner {
         let token_type = KEYWORDS.get(text);
 
         if let Some(token_type) = token_type {
-            self.add_token(*token_type, Literal::Null);
+            self.add_token(*token_type, Literal::None);
         } else {
-            self.add_token(TokenType::Identifier, Literal::Null);
+            self.add_token(TokenType::Identifier, Literal::None);
         }
     }
 
