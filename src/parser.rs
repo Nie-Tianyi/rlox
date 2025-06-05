@@ -100,7 +100,7 @@ impl Parser {
 // methods for constructing AST
 impl Parser {
     fn expression(&self) -> ParseResult<Expression> {
-        Ok(self.equality()?)
+        self.equality()
     }
 
     fn equality(&self) -> ParseResult<Expression> {
@@ -177,7 +177,7 @@ impl Parser {
             });
         }
 
-        Ok(self.primary()?)
+        self.primary()
     }
 
     fn primary(&self) -> ParseResult<Expression> {
@@ -252,7 +252,10 @@ mod tests {
     #[test]
     fn test_1() {
         assert_eq!(compile_to_ast("2 + 2;"), "(+ 2 2)");
-        assert_eq!(compile_to_ast("3.14 * (2 + 2);"), "(* 3.14 (group (+ 2 2)))");
+        assert_eq!(
+            compile_to_ast("3.14 * (2 + 2);"),
+            "(* 3.14 (group (+ 2 2)))"
+        );
         assert_eq!(compile_to_ast("3.14 * 2 + 2;"), "(+ (* 3.14 2) 2)")
     }
 }
