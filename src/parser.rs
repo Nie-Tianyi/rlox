@@ -34,8 +34,15 @@ impl Parser {
         }
     }
 
-    pub fn parse(&self) -> Expression {
-        self.expression().unwrap_or(Expression::Literal {value: ExprLiteral::Nil})
+    fn parse_tokens(&self) -> Expression {
+        self.expression().unwrap_or(Expression::Literal {
+            value: ExprLiteral::Nil,
+        })
+    }
+
+    pub fn parse(tokens: Vec<Token>) -> Expression {
+        let parser = Self::new(tokens);
+        parser.parse_tokens()
     }
 
     fn matches(&self, types: &[TokenType]) -> bool {
@@ -209,7 +216,7 @@ impl Parser {
             let val = match self.previous().literal() {
                 Literal::String(i) => i.clone(),
                 _ => {
-                   return Err(Self::error(self.peek(), "error parsing Strings"));
+                    return Err(Self::error(self.peek(), "error parsing Strings"));
                 }
             };
 
@@ -227,5 +234,21 @@ impl Parser {
         }
 
         Err(Self::error(self.peek(), "unexpected token"))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::expression::AstPrinter;
+    use crate::parser::Parser;
+    use crate::scanner::Scanner;
+
+    #[test]
+    fn test_1() {
+        let code = r#"2+2;"#;
+        let tokens = Scanner::parse(code);
+        let expr = Parser::parse(tokens);
+
+        println!("{}", expr.accept(&AstPrinter));
     }
 }

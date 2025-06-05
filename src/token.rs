@@ -125,7 +125,7 @@ impl Token {
     pub fn literal(&self) -> &Literal {
         &self.literal
     }
-    
+
     pub fn line(&self) -> usize {
         self.line
     }

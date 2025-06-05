@@ -110,7 +110,7 @@ impl Display for ExprLiteral {
 }
 
 #[allow(unused)]
-struct AstPrinter;
+pub struct AstPrinter;
 
 impl ExprVisitor<String> for AstPrinter {
     fn visit_binary(&self, left: &Box<Expression>, op: &Token, right: &Box<Expression>) -> String {
