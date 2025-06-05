@@ -27,6 +27,7 @@ type ParseResult<T> = Result<T, ParseError>;
 
 // basic methods
 impl Parser {
+    #[inline]
     pub fn new(tokens: Vec<Token>) -> Self {
         Parser {
             tokens,
@@ -34,17 +35,20 @@ impl Parser {
         }
     }
 
+    #[inline]
     fn parse_tokens(&self) -> Expression {
         self.expression().unwrap_or(Expression::Literal {
             value: ExprLiteral::Nil,
         })
     }
 
+    #[inline]
     pub fn parse(tokens: Vec<Token>) -> Expression {
         let parser = Self::new(tokens);
         parser.parse_tokens()
     }
 
+    #[inline]
     fn matches(&self, types: &[TokenType]) -> bool {
         for tt in types {
             if self.check(*tt) {
@@ -56,6 +60,7 @@ impl Parser {
         false
     }
 
+    #[inline]
     fn check(&self, token_type: TokenType) -> bool {
         if self.is_at_end() {
             return false;
@@ -64,6 +69,7 @@ impl Parser {
         self.peek().token_type() == token_type
     }
 
+    #[inline]
     fn advance(&self) -> &Token {
         if !self.is_at_end() {
             *self.current.borrow_mut() += 1;
@@ -72,18 +78,22 @@ impl Parser {
         self.previous()
     }
 
+    #[inline]
     fn is_at_end(&self) -> bool {
         self.peek().token_type() == EOF
     }
 
+    #[inline]
     fn peek(&self) -> &Token {
         &self.tokens[*self.current.borrow()]
     }
 
+    #[inline]
     fn previous(&self) -> &Token {
         &self.tokens[*self.current.borrow() - 1]
     }
 
+    #[inline]
     fn consume(&self, ty: TokenType, msg: impl Display) -> Result<&Token, ParseError> {
         if self.check(ty) {
             return Ok(self.advance());
@@ -92,6 +102,7 @@ impl Parser {
         Err(Self::error(self.peek(), msg))
     }
 
+    #[inline]
     fn error(t: &Token, msg: impl Display) -> ParseError {
         error_at_token(t, msg);
         ParseError
