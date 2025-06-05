@@ -243,12 +243,16 @@ mod tests {
     use crate::parser::Parser;
     use crate::scanner::Scanner;
 
+    fn compile_to_ast(source_code: &str) -> String {
+        let tokens = Scanner::parse(source_code);
+        let expr = Parser::parse(tokens);
+        expr.accept(&AstPrinter)
+    }
+
     #[test]
     fn test_1() {
-        let code = r#"2+2;"#;
-        let tokens = Scanner::parse(code);
-        let expr = Parser::parse(tokens);
-
-        println!("{}", expr.accept(&AstPrinter));
+        assert_eq!(compile_to_ast("2 + 2;"), "(+ 2 2)");
+        assert_eq!(compile_to_ast("3.14 * (2 + 2);"), "(* 3.14 (group (+ 2 2)))");
+        assert_eq!(compile_to_ast("3.14 * 2 + 2;"), "(+ (* 3.14 2) 2)")
     }
 }
