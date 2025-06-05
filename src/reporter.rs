@@ -1,9 +1,19 @@
+use crate::token::{Token, TokenType};
 use std::fmt::Display;
 use std::process;
 
 #[inline]
-pub fn error(line: usize, message: impl Display) {
+pub fn error_at_line(line: usize, message: impl Display) {
     report(line, "", message)
+}
+
+#[inline]
+pub fn error_at_token(token: &Token, message: impl Display) {
+    if token.token_type() == TokenType::EOF {
+        report(token.line(), " at end", message);
+    } else {
+        report(token.line(), format!(" at '{}'", token.lexeme()), message);
+    }
 }
 
 #[inline]

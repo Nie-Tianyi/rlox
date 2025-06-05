@@ -1,4 +1,5 @@
 use crate::expression::{ExprLiteral, Expression};
+use crate::reporter::error_at_token;
 use crate::token::TokenType::*;
 use crate::token::{Literal, Token, TokenType};
 use std::cell::RefCell;
@@ -19,12 +20,22 @@ struct Parser {
     current: RefCell<usize>,
 }
 
+#[derive(Debug)]
+struct ParseError;
+
+type ParseResult<T> = Result<T, ParseError>;
+
+// basic methods
 impl Parser {
-    fn new(tokens: Vec<Token>) -> Self {
+    pub fn new(tokens: Vec<Token>) -> Self {
         Parser {
             tokens,
             current: RefCell::new(0),
         }
+    }
+
+    pub fn parse(&self) -> Expression {
+        self.expression().unwrap_or(Expression::Literal {value: ExprLiteral::Nil})
     }
 
     fn matches(&self, types: &[TokenType]) -> bool {
@@ -66,16 +77,31 @@ impl Parser {
         &self.tokens[*self.current.borrow() - 1]
     }
 
-    fn expression(&self) -> Expression {
-        self.equality()
+    fn consume(&self, ty: TokenType, msg: impl Display) -> Result<&Token, ParseError> {
+        if self.check(ty) {
+            return Ok(self.advance());
+        }
+
+        Err(Self::error(self.peek(), msg))
     }
 
-    fn equality(&self) -> Expression {
-        let mut expr = self.comparison();
+    fn error(t: &Token, msg: impl Display) -> ParseError {
+        error_at_token(t, msg);
+        ParseError
+    }
+}
+// methods for constructing AST
+impl Parser {
+    fn expression(&self) -> ParseResult<Expression> {
+        Ok(self.equality()?)
+    }
+
+    fn equality(&self) -> ParseResult<Expression> {
+        let mut expr = self.comparison()?;
 
         while self.matches(&[BangEqual, EqualEqual]) {
             let token_operator = self.previous();
-            let right = self.comparison();
+            let right = self.comparison()?;
             expr = Expression::Binary {
                 left: Box::new(expr),
                 operator: token_operator.clone(),
@@ -83,15 +109,15 @@ impl Parser {
             }
         }
 
-        expr
+        Ok(expr)
     }
 
-    fn comparison(&self) -> Expression {
-        let mut expr = self.term();
+    fn comparison(&self) -> ParseResult<Expression> {
+        let mut expr = self.term()?;
 
         while self.matches(&[Greater, GreaterEqual, Less, LessEqual]) {
             let operator = self.previous();
-            let right = self.term();
+            let right = self.term()?;
             expr = Expression::Binary {
                 left: Box::new(expr),
                 operator: operator.clone(),
@@ -99,15 +125,15 @@ impl Parser {
             }
         }
 
-        expr
+        Ok(expr)
     }
 
-    fn term(&self) -> Expression {
-        let mut expr = self.factor();
+    fn term(&self) -> ParseResult<Expression> {
+        let mut expr = self.factor()?;
 
         while self.matches(&[Minus, Plus]) {
             let operator = self.previous();
-            let right = self.factor();
+            let right = self.factor()?;
             expr = Expression::Binary {
                 left: Box::new(expr),
                 operator: operator.clone(),
@@ -115,14 +141,14 @@ impl Parser {
             }
         }
 
-        expr
+        Ok(expr)
     }
 
-    fn factor(&self) -> Expression {
-        let mut expr = self.unary();
+    fn factor(&self) -> ParseResult<Expression> {
+        let mut expr = self.unary()?;
         while self.matches(&[Slash, Star]) {
             let operator = self.previous();
-            let right = self.unary();
+            let right = self.unary()?;
             expr = Expression::Binary {
                 left: Box::new(expr),
                 operator: operator.clone(),
@@ -130,80 +156,76 @@ impl Parser {
             }
         }
 
-        expr
+        Ok(expr)
     }
 
-    fn unary(&self) -> Expression {
+    fn unary(&self) -> ParseResult<Expression> {
         if self.matches(&[Bang, Minus]) {
             let op = self.previous();
-            let right = self.unary();
+            let right = self.unary()?;
 
-            return Expression::Unary {
+            return Ok(Expression::Unary {
                 operator: op.clone(),
                 right: Box::new(right),
-            };
+            });
         }
 
-        self.primary()
+        Ok(self.primary()?)
     }
 
-    fn primary(&self) -> Expression {
+    fn primary(&self) -> ParseResult<Expression> {
         if self.matches(&[False]) {
-            return Expression::Literal {
+            return Ok(Expression::Literal {
                 value: ExprLiteral::False,
-            };
+            });
         }
 
         if self.matches(&[True]) {
-            return Expression::Literal {
+            return Ok(Expression::Literal {
                 value: ExprLiteral::True,
-            };
+            });
         }
 
         if self.matches(&[Nil]) {
-            return Expression::Literal {
+            return Ok(Expression::Literal {
                 value: ExprLiteral::Nil,
-            };
+            });
         }
 
         if self.matches(&[Number]) {
             let val = match self.previous().literal() {
                 Literal::Number(i) => *i,
                 _ => {
-                    panic!("error parsing Number");
+                    return Err(Self::error(self.peek(), "error parsing Number"));
                 }
             };
 
-            return Expression::Literal {
+            return Ok(Expression::Literal {
                 value: ExprLiteral::Number(val),
-            };
+            });
         }
 
         if self.matches(&[String]) {
             let val = match self.previous().literal() {
                 Literal::String(i) => i.clone(),
                 _ => {
-                    panic!("error parsing Strings")
+                   return Err(Self::error(self.peek(), "error parsing Strings"));
                 }
             };
 
-            return Expression::Literal {
+            return Ok(Expression::Literal {
                 value: ExprLiteral::String(val),
-            };
+            });
         }
 
         if self.matches(&[LeftParen]) {
-            let expr = self.expression();
-            consume(RightParen, "Expect ')' after expression.");
-            return Expression::Grouping {
+            let expr = self.expression()?;
+            self.consume(RightParen, "Expect ')' after expression.")?;
+            return Ok(Expression::Grouping {
                 expr: Box::new(expr),
-            };
+            });
         }
 
-        panic!("error parsing tokens, mismatched patterns")
+        Err(Self::error(self.peek(), "unexpected token"))
     }
-}
-
-fn consume(ty: TokenType, msg: impl Display) {
-    unimplemented!()
 }

@@ -111,7 +111,7 @@ impl Scanner {
                         } else if Self::is_alpha(c) {
                             self.identifier();
                         } else {
-                            reporter::error(self.line, "Unexpected character.");
+                            reporter::error_at_line(self.line, "Unexpected character.");
                         }
                     }
                 }
@@ -170,7 +170,7 @@ impl Scanner {
         let val = &self.source[self.start..self.current];
         let val = val.parse::<f64>();
         if val.is_err() {
-            reporter::error(self.line, "error parsing number");
+            reporter::error_at_line(self.line, "error parsing number");
         }
         self.add_token(TokenType::Number, Literal::Number(val.unwrap()))
     }
@@ -183,7 +183,7 @@ impl Scanner {
             self.next_char();
         }
         if self.peek().is_none() {
-            reporter::error(self.line, "Unterminated String");
+            reporter::error_at_line(self.line, "Unterminated String");
             return;
         }
         self.next_char();
