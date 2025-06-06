@@ -61,8 +61,7 @@ pub enum ExprLiteral {
     String(String), // strings
     Number(f64),    // numbers
     Nil,            // nil
-    True,           // true
-    False,          // false
+    Bool(bool),     // true or false
 }
 
 impl Debug for ExprLiteral {
@@ -77,11 +76,11 @@ impl Debug for ExprLiteral {
             ExprLiteral::Nil => {
                 write!(f, "nil")
             }
-            ExprLiteral::False => {
-                write!(f, "false")
+            ExprLiteral::Bool(false) => {
+                write!(f, "bool:false")
             }
-            ExprLiteral::True => {
-                write!(f, "true")
+            ExprLiteral::Bool(true) => {
+                write!(f, "bool:true")
             }
         }
     }
@@ -99,10 +98,10 @@ impl Display for ExprLiteral {
             ExprLiteral::Nil => {
                 write!(f, "nil")
             }
-            ExprLiteral::True => {
+            ExprLiteral::Bool(true) => {
                 write!(f, "true")
             }
-            ExprLiteral::False => {
+            ExprLiteral::Bool(false) => {
                 write!(f, "false")
             }
         }

@@ -194,13 +194,13 @@ impl Parser {
     fn primary(&self) -> ParseResult<Expression> {
         if self.matches(&[False]) {
             return Ok(Expression::Literal {
-                value: ExprLiteral::False,
+                value: ExprLiteral::Bool(false),
             });
         }
 
         if self.matches(&[True]) {
             return Ok(Expression::Literal {
-                value: ExprLiteral::True,
+                value: ExprLiteral::Bool(true),
             });
         }
 
