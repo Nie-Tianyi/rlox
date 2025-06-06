@@ -15,15 +15,15 @@ use std::fmt::Display;
  * primary        → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
  */
 #[allow(unused)]
-struct Parser {
+pub struct Parser {
     tokens: Vec<Token>,
     current: RefCell<usize>,
 }
 
 #[derive(Debug)]
-struct ParseError;
+pub struct ParseError;
 
-type ParseResult<T> = Result<T, ParseError>;
+pub type ParseResult<T> = Result<T, ParseError>;
 
 // basic methods
 impl Parser {
