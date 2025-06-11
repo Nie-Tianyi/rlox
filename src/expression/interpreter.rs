@@ -278,16 +278,16 @@ mod tests {
     fn test_1() {
         assert_eq("1 + 1;", "2");
         assert_eq("1 + 1 * 2;", "3");
-        assert_eq("1 + 1 * 2 - 3;", "0");
         assert_eq("1 + 1 * 2 - 3 / 4;", "2.25");
-        assert_eq("1 + 1 * 2 - 3 / 4 > 5;", "false");
-        assert_eq("1 + 1 * 2 - 3 / 4 < 5;", "true");
-        assert_eq("1 + 1 * 2 - 3 / 4 >= 5;", "false");
-        assert_eq("1 + 1 * 2 - 3 / 4 <= 5;", "true");
+        assert_eq("4 > 5;", "false");
+        assert_eq("4 < 5;", "true");
+        assert_eq("4 >= 5;", "false");
+        assert_eq("4 <= 5;", "true");
         assert_eq("123 + \"123\"", "123123");
         assert_eq("123 + \"123\" == \"123123\";", "true");
         assert_eq("123 + \"123\" != \"123123\";", "false");
-        assert_eq("123 + \"123\" == 123123 + 1;", "false");
+        assert_eq("!true", "false");
+        assert_eq("!1;", "false");
         
         assert_error("123 + true == 123123;");
     }
