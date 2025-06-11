@@ -250,7 +250,7 @@ impl Parser {
 
 #[cfg(test)]
 mod tests {
-    use crate::expression::AstPrinter;
+    use crate::expression::ast_printer::AstPrinter;
     use crate::parser::Parser;
     use crate::scanner::Scanner;
 
@@ -262,11 +262,15 @@ mod tests {
 
     #[test]
     fn test_1() {
+        // 现在语法分析其只支持以下这些运算
+        // == != > >= < <=
+        // + - * / ! -
+        // number string nil true false ()
         assert_eq!(compile_to_ast("2 + 2;"), "(+ 2 2)");
         assert_eq!(
             compile_to_ast("3.14 * (2 + 2);"),
             "(* 3.14 (group (+ 2 2)))"
         );
-        assert_eq!(compile_to_ast("3.14 * 2 + 2;"), "(+ (* 3.14 2) 2)")
+        assert_eq!(compile_to_ast("3.14 * 2 + 2;"), "(+ (* 3.14 2) 2)");
     }
 }
