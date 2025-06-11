@@ -65,9 +65,9 @@ impl Scanner {
                     '*' => self.add_token(TokenType::Star, Literal::None),
                     '!' => {
                         if self.next_char_matches('=') {
-                            self.add_token(TokenType::Bang, Literal::None);
-                        } else {
                             self.add_token(TokenType::BangEqual, Literal::None);
+                        } else {
+                            self.add_token(TokenType::Bang, Literal::None);
                         }
                     }
                     '=' => {

@@ -1,4 +1,4 @@
-use crate::token::{Literal, Token};
+use crate::token::{Token};
 use std::fmt::{Debug, Display, Formatter};
 
 /*
@@ -56,7 +56,7 @@ define_ast! {
     (Unary(operator: Token, right: Box<Expression>), visit_unary)
 }
 
-#[derive(PartialEq)]
+#[derive(Clone)]
 pub enum ExprLiteral {
     String(String), // strings
     Number(f64),    // numbers
@@ -116,7 +116,7 @@ pub mod interpreter;
 mod tests {
     use crate::expression::ast_printer::AstPrinter;
     use super::*;
-    use crate::token::TokenType;
+    use crate::token::{Literal, TokenType};
 
     #[test]
     fn test_ast() {
