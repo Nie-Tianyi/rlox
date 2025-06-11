@@ -1,6 +1,6 @@
-use std::fmt::{Display, Formatter};
 use crate::expression::{ExprLiteral, ExprVisitor, Expression};
 use crate::token::{Token, TokenType};
+use std::fmt::{Display, Formatter};
 use std::ops::{Neg, Not};
 
 #[derive(Debug)]
@@ -253,11 +253,11 @@ impl Interpreter {
 
 #[cfg(test)]
 mod tests {
-    
+
     use crate::expression::interpreter::Interpreter;
     use crate::parser::Parser;
     use crate::scanner::Scanner;
-    
+
     fn assert_eq(source: &str, expected: &str) {
         let tokens = Scanner::parse(source);
         let parser = Parser::parse(tokens);
@@ -266,14 +266,14 @@ mod tests {
         let val = expr.unwrap();
         assert_eq!(val.into_string(), expected);
     }
-    
+
     fn assert_error(source: &str) {
         let tokens = Scanner::parse(source);
         let parser = Parser::parse(tokens);
         let expr = parser.accept(&Interpreter);
         assert!(expr.is_err());
     }
-    
+
     #[test]
     fn test_1() {
         assert_eq("1 + 1;", "2");
@@ -288,5 +288,7 @@ mod tests {
         assert_eq("123 + \"123\" == \"123123\";", "true");
         assert_eq("123 + \"123\" != \"123123\";", "false");
         assert_eq("123 + \"123\" == 123123 + 1;", "false");
+        
+        assert_error("123 + true == 123123;");
     }
 }

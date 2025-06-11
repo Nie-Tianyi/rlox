@@ -272,7 +272,7 @@ mod tests {
             "(* 3.14 (group (+ 2 2)))"
         );
         assert_eq!(compile_to_ast("3.14 * 2 + 2;"), "(+ (* 3.14 2) 2)");
-        
+
         println!("{}", compile_to_ast("123 + \"123\" != \"123123\";"));
     }
 }

@@ -1,4 +1,4 @@
-use crate::token::{Token};
+use crate::token::Token;
 use std::fmt::{Debug, Display, Formatter};
 
 /*
@@ -114,8 +114,8 @@ pub mod interpreter;
 // 测试代码
 #[cfg(test)]
 mod tests {
-    use crate::expression::ast_printer::AstPrinter;
     use super::*;
+    use crate::expression::ast_printer::AstPrinter;
     use crate::token::{Literal, TokenType};
 
     #[test]
