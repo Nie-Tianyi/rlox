@@ -1,7 +1,7 @@
 use std::fmt::{Display, Formatter};
 use crate::expression::{ExprLiteral, ExprVisitor, Expression};
 use crate::token::{Token, TokenType};
-use std::ops::{Add, Neg, Not};
+use std::ops::{Neg, Not};
 
 #[derive(Debug)]
 pub struct RuntimeError {
