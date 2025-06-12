@@ -108,6 +108,7 @@ impl Display for ExprLiteral {
     }
 }
 
+#[cfg(test)]
 pub mod ast_printer;
 pub mod interpreter;
 
