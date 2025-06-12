@@ -19,7 +19,7 @@ pub fn error_at_token(token: &Token, message: impl Display) {
 
 #[inline]
 pub fn runtime_error(error: RuntimeError) {
-    println!("{}\n[line {}]", error.msg, error.token.line());
+    println!("[line {}] RuntimeError {}", error.token.line(), error.msg);
     process::exit(70);
 }
 
