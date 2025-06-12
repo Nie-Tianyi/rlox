@@ -253,7 +253,6 @@ impl Interpreter {
 
 #[cfg(test)]
 mod tests {
-
     use crate::expression::interpreter::Interpreter;
     use crate::parser::Parser;
     use crate::scanner::Scanner;
@@ -288,7 +287,7 @@ mod tests {
         assert_eq("123 + \"123\" != \"123123\";", "false");
         assert_eq("!true", "false");
         assert_eq("!1;", "false");
-        
+
         assert_error("123 + true == 123123;");
     }
 }

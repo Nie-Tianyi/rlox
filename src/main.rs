@@ -4,26 +4,23 @@ mod reporter;
 mod scanner;
 mod token;
 
+use crate::expression::interpreter::Interpreter;
+use crate::parser::Parser;
 use crate::scanner::Scanner;
-use clap::{Parser, ValueHint};
 use std::io::{Read, Write};
 use std::path::Path;
-use std::{fs, io};
-
-#[derive(Parser)]
-#[command(version, about, long_about = None)]
-struct Cli {
-    #[arg(value_parser = clap::value_parser!(String),num_args = 1,
-        value_hint = ValueHint::FilePath,)]
-    path: Option<String>,
-}
+use std::{env, fs, io};
 
 fn main() {
-    let cli = Cli::parse();
+    let args: Vec<String> = env::args().collect();
 
-    match cli.path {
-        Some(path) => run_file(path),
-        None => run_prompt(),
+    match args.len() {
+        2 => run_file(&args[1]),
+        1 => run_prompt(),
+        _ => {
+            eprintln!("Usage: {} [file_path]", args[0]);
+            std::process::exit(1);
+        }
     }
 }
 
@@ -59,5 +56,12 @@ fn run_file(path: impl AsRef<Path>) {
 }
 
 fn run(source_code: String) {
-    println!("run {:?}", Scanner::parse(source_code))
+    let tokens = Scanner::parse(source_code);
+    let expr = Parser::parse(tokens);
+    let result = expr.accept(&Interpreter);
+
+    match result {
+        Ok(val) => println!("{}", val),
+        Err(err) => println!("{:?}", err),
+    }
 }

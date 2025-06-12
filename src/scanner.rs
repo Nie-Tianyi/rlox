@@ -38,7 +38,7 @@ pub struct Scanner {
 }
 
 impl Scanner {
-    fn new(source: impl ToString) -> Self {
+    pub(crate) fn new(source: impl ToString) -> Self {
         Scanner {
             source: source.to_string(),
             tokens: vec![],
@@ -48,7 +48,7 @@ impl Scanner {
         }
     }
 
-    fn scan_tokens(&mut self) {
+    pub(crate) fn scan_tokens(&mut self) {
         loop {
             self.start = self.current;
             if let Some(c) = self.next_char() {
