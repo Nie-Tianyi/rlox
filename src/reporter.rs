@@ -1,3 +1,4 @@
+use crate::expression::interpreter::RuntimeError;
 use crate::token::{Token, TokenType};
 use std::fmt::Display;
 use std::process;
@@ -14,6 +15,12 @@ pub fn error_at_token(token: &Token, message: impl Display) {
     } else {
         report(token.line(), format!(" at '{}'", token.lexeme()), message);
     }
+}
+
+#[inline]
+pub fn runtime_error(error: RuntimeError) {
+    println!("{}\n[line {}]", error.msg, error.token.line());
+    process::exit(70);
 }
 
 #[inline]

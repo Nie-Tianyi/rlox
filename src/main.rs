@@ -58,10 +58,5 @@ fn run_file(path: impl AsRef<Path>) {
 fn run(source_code: String) {
     let tokens = Scanner::parse(source_code);
     let expr = Parser::parse(tokens);
-    let result = expr.accept(&Interpreter);
-
-    match result {
-        Ok(val) => println!("{}", val),
-        Err(err) => println!("{:?}", err),
-    }
+    Interpreter::interpret(&expr);
 }

@@ -1,11 +1,13 @@
 use crate::expression::{ExprLiteral, ExprVisitor, Expression};
+use crate::reporter::runtime_error;
 use crate::token::{Token, TokenType};
 use std::fmt::{Display, Formatter};
 use std::ops::{Neg, Not};
 
 #[derive(Debug)]
 pub struct RuntimeError {
-    msg: &'static str,
+    pub msg: &'static str,
+    pub token: Token,
 }
 
 type RuntimeResult<T> = Result<T, RuntimeError>;
@@ -43,17 +45,18 @@ impl Display for Value {
 
 impl Value {
     // -val
-    fn negative(self) -> RuntimeResult<Value> {
+    fn negative(self, operator: &Token) -> RuntimeResult<Value> {
         match self {
             Value::Number(n) => Ok(Value::Number(n.neg())),
             _ => Err(RuntimeError {
                 msg: "Cannot apply negative operand on non-numeric values",
+                token: operator.clone(),
             }),
         }
     }
 
     // !val
-    fn ops_not(self) -> RuntimeResult<Value> {
+    fn ops_not(self, _operator: &Token) -> RuntimeResult<Value> {
         Ok(Value::Bool(self.into_bool().not()))
     }
 
@@ -75,12 +78,13 @@ impl Value {
         }
     }
 
-    fn try_into_number(self) -> RuntimeResult<f64> {
+    fn try_into_number(self, operator: &Token) -> RuntimeResult<f64> {
         match self {
             Value::Str(s) => match s.parse::<f64>() {
                 Ok(f) => Ok(f),
                 Err(_) => Err(RuntimeError {
                     msg: "Error parsing numbers",
+                    token: operator.clone(),
                 }),
             },
             Value::Number(n) => Ok(n),
@@ -90,7 +94,7 @@ impl Value {
     }
 
     // val1 + val2
-    fn add(self, other: Self) -> RuntimeResult<Value> {
+    fn add(self, other: Self, operator: &Token) -> RuntimeResult<Value> {
         match (self, other) {
             (Value::Str(s1), Value::Str(s2)) => Ok(Value::Str(s1 + s2.as_str())),
             (Value::Number(n1), Value::Number(n2)) => Ok(Value::Number(n1 + n2)),
@@ -98,82 +102,90 @@ impl Value {
             (Value::Number(n), Value::Str(s)) => Ok(Value::Str(n.to_string() + s.as_str())), // 语法糖
             _ => Err(RuntimeError {
                 msg: "Cannot apply addition operand on non-numeric values",
+                token: operator.clone(),
             }),
         }
     }
 
     // val1 - val2
-    fn sub(self, other: Self) -> RuntimeResult<Value> {
+    fn sub(self, other: Self, operator: &Token) -> RuntimeResult<Value> {
         match (self, other) {
             (Value::Number(n1), Value::Number(n2)) => Ok(Value::Number(n1 - n2)),
             _ => Err(RuntimeError {
                 msg: "Cannot apply subtraction operand on non-numeric values",
+                token: operator.clone(),
             }),
         }
     }
 
     // val1 * val2
-    fn mul(self, other: Self) -> RuntimeResult<Value> {
+    fn mul(self, other: Self, operator: &Token) -> RuntimeResult<Value> {
         match (self, other) {
             (Value::Number(n1), Value::Number(n2)) => Ok(Value::Number(n1 * n2)),
             _ => Err(RuntimeError {
                 msg: "Cannot apply multiplication operand on non-numeric values",
+                token: operator.clone(),
             }),
         }
     }
 
     // val1 / val2
-    fn div(self, other: Self) -> RuntimeResult<Value> {
+    fn div(self, other: Self, operator: &Token) -> RuntimeResult<Value> {
         match (self, other) {
             (Value::Number(n1), Value::Number(n2)) => Ok(Value::Number(n1 / n2)),
             _ => Err(RuntimeError {
                 msg: "Cannot apply division operand on non-numeric values",
+                token: operator.clone(),
             }),
         }
     }
 
     // val1 > val2
-    fn gt(self, other: Self) -> RuntimeResult<Value> {
+    fn gt(self, other: Self, operator: &Token) -> RuntimeResult<Value> {
         match (self, other) {
             (Value::Number(n1), Value::Number(n2)) => Ok(Value::Bool(n1 > n2)),
             _ => Err(RuntimeError {
                 msg: "Cannot apply greater than operand on non-numeric values",
+                token: operator.clone(),
             }),
         }
     }
 
     // val1 >= val2
-    fn gte(self, other: Self) -> RuntimeResult<Value> {
+    fn gte(self, other: Self, operator: &Token) -> RuntimeResult<Value> {
         match (self, other) {
             (Value::Number(n1), Value::Number(n2)) => Ok(Value::Bool(n1 >= n2)),
             _ => Err(RuntimeError {
                 msg: "Cannot apply greater than or equal operand on non-numeric values",
+                token: operator.clone(),
             }),
         }
     }
 
     // val1 < val2
-    fn lt(self, other: Self) -> RuntimeResult<Value> {
+    fn lt(self, other: Self, operator: &Token) -> RuntimeResult<Value> {
         match (self, other) {
             (Value::Number(n1), Value::Number(n2)) => Ok(Value::Bool(n1 < n2)),
             _ => Err(RuntimeError {
                 msg: "Cannot apply less than operand on non-numeric values",
+                token: operator.clone(),
             }),
         }
     }
 
     // val1 <= val2
-    fn lte(self, other: Self) -> RuntimeResult<Value> {
+    fn lte(self, other: Self, operator: &Token) -> RuntimeResult<Value> {
         match (self, other) {
             (Value::Number(n1), Value::Number(n2)) => Ok(Value::Bool(n1 <= n2)),
             _ => Err(RuntimeError {
                 msg: "Cannot apply less than or equal operand on non-numeric values",
+                token: operator.clone(),
             }),
         }
     }
 
     // val1 == val2
-    fn eq(self, other: Self) -> RuntimeResult<Value> {
+    fn eq(self, other: Self, _operator: &Token) -> RuntimeResult<Value> {
         match (self, other) {
             (Value::Number(n1), Value::Number(n2)) => Ok(Value::Bool(n1 == n2)),
             (Value::Str(s1), Value::Str(s2)) => Ok(Value::Bool(s1 == s2)),
@@ -184,7 +196,7 @@ impl Value {
     }
 
     // val1 != val2
-    fn neq(self, other: Self) -> RuntimeResult<Value> {
+    fn neq(self, other: Self, _operator: &Token) -> RuntimeResult<Value> {
         match (self, other) {
             (Value::Number(n1), Value::Number(n2)) => Ok(Value::Bool(n1 != n2)),
             (Value::Str(s1), Value::Str(s2)) => Ok(Value::Bool(s1 != s2)),
@@ -208,16 +220,17 @@ impl ExprVisitor<RuntimeResult<Value>> for Interpreter {
         let right_val = self.evaluate(right)?;
 
         match operator.token_type() {
-            TokenType::Minus => left_val.sub(right_val),
-            TokenType::Plus => left_val.add(right_val),
-            TokenType::Slash => left_val.div(right_val),
-            TokenType::Star => left_val.mul(right_val),
-            TokenType::Greater => left_val.gt(right_val),
-            TokenType::GreaterEqual => left_val.gte(right_val),
-            TokenType::Less => left_val.lt(right_val),
-            TokenType::LessEqual => left_val.lte(right_val),
-            TokenType::BangEqual => left_val.neq(right_val),
-            TokenType::EqualEqual => left_val.eq(right_val),
+            // 直接把operator传给了Value的方法，用于报错
+            TokenType::Minus => left_val.sub(right_val, operator),
+            TokenType::Plus => left_val.add(right_val, operator),
+            TokenType::Slash => left_val.div(right_val, operator),
+            TokenType::Star => left_val.mul(right_val, operator),
+            TokenType::Greater => left_val.gt(right_val, operator),
+            TokenType::GreaterEqual => left_val.gte(right_val, operator),
+            TokenType::Less => left_val.lt(right_val, operator),
+            TokenType::LessEqual => left_val.lte(right_val, operator),
+            TokenType::BangEqual => left_val.neq(right_val, operator),
+            TokenType::EqualEqual => left_val.eq(right_val, operator),
             _ => unreachable!(),
         }
     }
@@ -238,14 +251,23 @@ impl ExprVisitor<RuntimeResult<Value>> for Interpreter {
     fn visit_unary(&self, operator: &Token, right: &Box<Expression>) -> RuntimeResult<Value> {
         let right_val = self.evaluate(right)?;
         match operator.token_type() {
-            TokenType::Minus => right_val.negative(),
-            TokenType::Bang => right_val.ops_not(),
+            TokenType::Minus => right_val.negative(operator),
+            TokenType::Bang => right_val.ops_not(operator),
             _ => unreachable!(),
         }
     }
 }
 
 impl Interpreter {
+    pub fn interpret(expr: &Expression) {
+        match Interpreter.evaluate(expr) {
+            Ok(val) => {
+                println!("{}", val.into_string());
+            }
+            Err(err) => runtime_error(err),
+        }
+    }
+
     fn evaluate(&self, expr: &Expression) -> RuntimeResult<Value> {
         expr.accept(self)
     }
